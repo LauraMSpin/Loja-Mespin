@@ -1,0 +1,32 @@
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Arquivos de editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Arquivos de build (se houver)
+/node_modules
+/dist
+/build
+
+# Arquivo de documentação local
+.env
+.env.local
+
+# Arquivos temporários
+*.tmp
+*.log
+npm-debug.log*
+
+# Pastas específicas do Windows
+.Trashes/
+
+# Arquivo de configuração local do desenvolvedor
+config-local.js

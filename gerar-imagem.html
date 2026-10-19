@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerar Imagem Vela</title>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <br>
+    <button onclick="salvar()">Baixar Imagem</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        canvas.width = 1122;
+        canvas.height = 1402;
+        const ctx = canvas.getContext('2d');
+        
+        // Fundo neutro
+        ctx.fillStyle = '#F5F2EB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const cx = canvas.width / 2;
+        const cy = canvas.height / 2;
+        
+        // Desenho do copo (vidro fosco)
+        ctx.fillStyle = '#E6DCD3';
+        ctx.fillRect(cx - 120, cy + 150, 240, 300);
+        ctx.strokeStyle = '#96847E';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(cx - 120, cy + 150, 240, 300);
+        
+        // Boca do copo (rimmed top)
+        ctx.strokeStyle = '#96847E';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(cx - 120, cy + 150);
+        ctx.lineTo(cx - 150, cy + 120);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx + 120, cy + 150);
+        ctx.lineTo(cx + 150, cy + 120);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx - 150, cy + 120);
+        ctx.lineTo(cx + 150, cy + 120);
+        ctx.stroke();
+        
+        // Cera dentro do copo (amarelada/bege)
+        ctx.fillStyle = '#F5C364';
+        ctx.fillRect(cx - 110, cy + 160, 220, 180);
+        
+        // Pavio (wick)
+        ctx.fillStyle = '#2A2A2A';
+        ctx.fillRect(cx - 2, cy - 50, 4, 220);
+        
+        // Chama (flame)
+        ctx.fillStyle = '#FFB432';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 85, 25, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Sombra do copo
+        ctx.fillStyle = 'rgba(150, 132, 126, 0.15)';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy + 455, 140, 30, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        function salvar() {
+            const link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = 'produto-001.png';
+            link.click();
+        }
+    </script>
+</body>
+</html>

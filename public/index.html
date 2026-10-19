@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mespín - Aromas e Velas Artesanais</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="base-url.js"></script>
+</head>
+<body>
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <p>🚚 Frete para todo Brasil | 🎁 Embalagem Especial | ♻️ Sustentável</p>
+    </div>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-wrapper">
+            <div class="logo-section">
+                <img src="logo-mespin.png" alt="Logo Mespín" class="logo-img">
+                <div class="logo-text">Mespín</div>
+            </div>
+
+            <nav>
+                <a href="#inicio" class="nav-link">Início</a>
+                <a href="#catalogo" class="nav-link">Catálogo</a>
+                <a href="natal.html" class="nav-link">Natal</a>
+            </nav>
+
+            <div class="search-container">
+                <input type="text" id="search-input" class="search-box" placeholder="Buscar...">
+                <button class="search-btn">🔍</button>
+            </div>
+
+            <button class="cart-button" id="cart-btn">
+                🛒 <span class="cart-count">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- BANNER -->
+    <section class="banner-hero" id="inicio">
+        <div class="banner-content">
+            <h1 class="banner-title">Aromas que transformam momentos</h1>
+            <p class="banner-subtitle">Velas e aromatizadores artesanais para uma casa mais acolhedora</p>
+            <a href="#catalogo" class="banner-btn">VER CATÁLOGO →</a>
+        </div>
+    </section>
+
+    <!-- CATEGORIAS -->
+    <section class="categories-nav">
+        <div class="categories-grid"></div>
+    </section>
+    <input type="hidden" id="category-filter" value="">
+
+    <!-- CATÁLOGO -->
+    <section id="catalogo" class="catalog-section">
+        <div class="section-header">
+            <h2 class="section-title">Nossos Produtos</h2>
+            <p class="section-subtitle">Escolha a melhor opção para seu lar</p>
+        </div>
+        <div id="produtos-grid" class="produtos-grid"></div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>&copy; 2024 Mespín - Aromas com Alma | WhatsApp: +55 31 9 8484-0078</p>
+    </footer>
+
+    <!-- MODAL OVERLAY -->
+    <div class="modal-overlay">
+        <!-- MODAL PRODUTO -->
+        <div id="modal-produto" class="modal modal-produto-compacto">
+            <button class="modal-close">&times;</button>
+            
+            <!-- LAYOUT EM DUAS COLUNAS -->
+            <div class="modal-two-columns">
+                <!-- COLUNA ESQUERDA: IMAGEM -->
+                <div class="modal-col-imagem">
+                    <div id="modal-image" class="modal-image">🎁</div>
+                </div>
+                
+                <!-- COLUNA DIREITA: INFORMAÇÕES E SELEÇÃO -->
+                <div class="modal-col-info">
+                    <div class="modal-info-scroll">
+                        <!-- Categoria -->
+                        <div class="modal-category" id="modal-category"></div>
+                        
+                        <!-- Nome -->
+                        <h2 id="modal-name" class="modal-name"></h2>
+                        
+                        <!-- Descrição -->
+                        <p id="modal-desc" class="modal-description"></p>
+                        
+                        <!-- Preço -->
+                        <div class="modal-price">R$ <span id="modal-price">0.00</span></div>
+
+                        <!-- Aromas -->
+                        <div id="personalizacao-container" style="display:none;">
+                            <div class="modal-section-label">Escolha o Aroma:</div>
+                            <div id="aromas-simples-container" class="aromas-container">
+                                <div id="aromas-checkboxes"></div>
+                            </div>
+                        </div>
+
+                        <!-- Kit Aromas -->
+                        <div id="aromas-kit-container" style="display:none;">
+                            <div class="modal-section-label">Combinação de Aromas:</div>
+                            <div id="aromas-kit-checkboxes" class="kit-aromas"></div>
+                        </div>
+
+                        <!-- Quantidade -->
+                        <div class="qty-section">
+                            <div class="modal-section-label">Quantidade:</div>
+                            <div class="qty-control">
+                                <button id="qty-minus">−</button>
+                                <input type="number" id="qty-input" value="1" min="1">
+                                <button id="qty-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botões (Sticky no fundo) -->
+                    <div class="modal-actions modal-actions-compacto">
+                        <button id="add-to-cart" class="btn-add btn-add-compacto">
+                            Adicionar ao Carrinho
+                            <div id="btn-tooltip" class="btn-tooltip" style="display:none;"></div>
+                        </button>
+                        <button id="modal-close-btn" class="btn-cancel">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL CARRINHO -->
+        <div id="modal-carrinho" class="modal">
+        <button class="modal-close">&times;</button>
+        <div class="modal-header">
+            <h2>🛒 Seu Carrinho</h2>
+        </div>
+        <div class="modal-body">
+            <div id="carrinho-vazio" class="carrinho-vazio" style="display:none;">
+                <p>Seu carrinho está vazio</p>
+            </div>
+            <div id="carrinho-items" class="carrinho-items"></div>
+            <div id="carrinho-totais" class="carrinho-totais" style="display:none;">
+                <div class="totais-row">
+                    <span>Subtotal:</span>
+                    <span>R$ <span id="subtotal">0.00</span></span>
+                </div>
+                <div class="totais-row">
+                    <span>Frete:</span>
+                    <span>R$ <span id="frete-atual">0.00</span></span>
+                </div>
+                <div class="totais-row total">
+                    <span>Total:</span>
+                    <span>R$ <span id="total">0.00</span></span>
+                </div>
+            </div>
+
+            <!-- Cliente Info -->
+            <div id="cliente-form" style="display:none;">
+                <h3>Informações de Entrega</h3>
+                <input type="text" id="cliente-nome" placeholder="Nome completo" class="form-input">
+                <input type="text" id="cliente-cep" placeholder="CEP (00000-000)" class="form-input" maxlength="9">
+                <div id="frete-opcoes" style="margin-top: 10px; font-size: 14px; display: none;"></div>
+                <div id="opcoes-frete" style="margin-top: 10px; font-size: 14px; display: none;"></div>
+            </div>
+
+            <!-- Ações -->
+            <div class="modal-actions">
+                <button id="finalizar-compra" class="btn-add" style="display:none;">Finalizar Compra</button>
+                <button id="limpar-carrinho" class="btn-cancel" style="display:none;">Limpar</button>
+            </div>
+        </div>
+    </div>
+    </div><!-- Fecha modal-overlay -->
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- SCRIPTS -->
+    <script src="config.js"></script>
+    <script src="categories.js"></script>
+    <script src="products-data.js"></script>
+    <script src="app-state.js"></script>
+    <script src="aromas.js"></script>
+    <script src="persistence.js"></script>
+    <script src="dom.js"></script>
+    <script src="products.js"></script>
+    <script src="utils.js"></script>
+    <script src="modal.js"></script>
+    <script src="cart.js"></script>
+    <script src="checkout.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

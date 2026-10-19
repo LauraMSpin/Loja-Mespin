@@ -1,0 +1,2 @@
+function salvarCarrinho(){localStorage.setItem('mespin_carrinho',JSON.stringify({carrinho:app.carrinho,personalizacoes:app.personalizacoes,clienteInfo:app.clienteInfo}));}
+function carregarCarrinho(){const d=localStorage.getItem('mespin_carrinho');if(d){const p=JSON.parse(d);app.carrinho=p.carrinho||[];app.personalizacoes=p.personalizacoes||{};app.clienteInfo=p.clienteInfo||{nome:'',email:'',whatsapp:''};atualizarCarrinho();}}

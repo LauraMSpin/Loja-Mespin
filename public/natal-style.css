@@ -1,0 +1,385 @@
+/* ============================================
+   PÁGINA DE NATAL - MESPÍN PREMIUM
+   ============================================ */
+
+.natal-page {
+  background-color: #FAF0E6;
+}
+
+/* ============================================
+   BANNER NATALINO
+   ============================================ */
+
+.banner-natal {
+  background: linear-gradient(135deg, #3E2723 0%, #5D4037 100%);
+  background-image: url('natal-banner-hero.png');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #FAF0E6;
+  padding: 80px 60px;
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  border-radius: 12px;
+  margin: 20px;
+}
+
+/* Camada de fundo com zoom animado */
+.banner-natal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('natal-banner-hero.png');
+  background-size: cover;
+  background-position: left center;
+  background-repeat: no-repeat;
+  animation: gentleZoomNatal 18s ease-in-out infinite;
+  z-index: 1;
+}
+
+/* Gradiente overlay para legibilidade */
+.banner-natal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    rgba(62, 39, 35, 0.75) 0%,
+    rgba(93, 64, 55, 0.5) 40%,
+    transparent 100%
+  );
+  z-index: 2;
+}
+
+/* Animação de zoom lento */
+@keyframes gentleZoomNatal {
+  0%, 100% {
+    transform: scale(1.02);
+  }
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.banner-natal-content {
+  position: relative;
+  z-index: 3;
+  max-width: 600px;
+}
+
+.banner-natal-title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.3;
+  color: #FAF0E6;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: fadeInUpNatal 800ms ease-out 100ms forwards;
+  opacity: 0;
+}
+
+.banner-natal-subtitle {
+  font-size: 1.15rem;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: #FAF0E6;
+  opacity: 0.95;
+  animation: fadeInUpNatal 800ms ease-out 200ms forwards;
+  opacity: 0;
+  max-width: 450px;
+}
+
+.banner-natal-btn {
+  display: inline-block;
+  background-color: #C19A6B;
+  color: #3E2723;
+  padding: 14px 32px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 700;
+  transition: all 250ms ease-out;
+  border: 2px solid #C19A6B;
+  cursor: pointer;
+  font-family: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: fadeInUpNatal 800ms ease-out 300ms forwards;
+  opacity: 0;
+}
+
+.banner-natal-btn:hover {
+  background-color: #D4B896;
+  border-color: #D4B896;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+}
+
+.banner-natal-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Animação de entrada */
+@keyframes fadeInUpNatal {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================
+   SEÇÃO COLEÇÃO NATAL
+   ============================================ */
+
+.colecao-natal-section {
+  padding: 80px 20px;
+  background: linear-gradient(to bottom, #FAF0E6 0%, #FAF0E6 100%);
+}
+
+.colecao-natal-section .section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.colecao-natal-section .section-title {
+  font-size: 2.5rem;
+  color: #3E2723;
+  margin-bottom: 10px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+}
+
+.colecao-natal-section .section-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  font-weight: 300;
+}
+
+/* Grid de produtos Natal */
+.colecao-natal-section .produtos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ============================================
+   RODAPÉ PERSONALIZADO NATAL
+   ============================================ */
+
+footer {
+  background: linear-gradient(135deg, #3E2723 0%, #5D4037 100%);
+  color: #FAF0E6;
+  padding: 60px 20px 30px;
+  margin-top: 80px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+}
+
+.footer-section h4 {
+  color: #C19A6B;
+  margin-bottom: 15px;
+  font-size: 1.1rem;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 700;
+}
+
+.footer-section ul {
+  list-style: none;
+}
+
+.footer-section ul li {
+  margin-bottom: 8px;
+}
+
+.footer-section a {
+  color: #FAF0E6;
+  text-decoration: none;
+  transition: color 250ms ease;
+  font-size: 0.95rem;
+}
+
+.footer-section a:hover {
+  color: #C19A6B;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.footer-logo-img {
+  height: 40px;
+  width: auto;
+}
+
+.footer-logo-text {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FAF0E6;
+}
+
+.footer-slogan {
+  color: #C19A6B;
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
+.footer-copyright {
+  text-align: center;
+  border-top: 1px solid rgba(250, 240, 230, 0.2);
+  padding-top: 20px;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+/* ============================================
+   RESPONSIVIDADE - NATAL
+   ============================================ */
+
+@media (max-width: 768px) {
+  .banner-natal {
+    padding: 50px 30px;
+    min-height: 380px;
+    background-attachment: scroll;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .banner-natal::before,
+  .banner-natal::after {
+    background-attachment: scroll;
+  }
+
+  .banner-natal-overlay {
+    background: linear-gradient(
+      to right,
+      rgba(62, 39, 35, 0.8) 0%,
+      rgba(93, 64, 55, 0.6) 50%,
+      rgba(93, 64, 55, 0.3) 100%
+    );
+  }
+
+  .banner-natal-title {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .banner-natal-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    max-width: none;
+  }
+
+  .banner-natal-btn {
+    padding: 12px 24px;
+    font-size: 0.9rem;
+  }
+
+  .colecao-natal-section {
+    padding: 50px 15px;
+  }
+
+  .colecao-natal-section .section-title {
+    font-size: 2rem;
+  }
+
+  .colecao-natal-section .section-subtitle {
+    font-size: 1rem;
+  }
+
+  .colecao-natal-section .produtos-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+  }
+
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner-natal {
+    padding: 40px 20px;
+    min-height: 320px;
+    margin: 10px;
+  }
+
+  .banner-natal-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .banner-natal-subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .banner-natal-btn {
+    padding: 10px 20px;
+    font-size: 0.85rem;
+  }
+
+  .banner-natal::before {
+    animation: gentleZoomNatal 25s ease-in-out infinite;
+  }
+
+  .colecao-natal-section .section-title {
+    font-size: 1.5rem;
+  }
+
+  .colecao-natal-section .produtos-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   ACESSIBILIDADE - NATAL
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .banner-natal::before {
+    animation: none;
+  }
+
+  .banner-natal-title,
+  .banner-natal-subtitle,
+  .banner-natal-btn {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .banner-natal-btn:hover {
+    transform: none;
+  }
+}
