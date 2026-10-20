@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Lato:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <script src="base-url.js"></script>
+    <script src="namespace.js"></script>
 </head>
 <body>
     <!-- TOP BAR -->
@@ -181,18 +182,26 @@
     <div id="toast" class="toast"></div>
 
     <!-- SCRIPTS -->
-    <script src="config.js"></script>
+    <!-- 1. Namespace e configuração global -->
+    <script src="namespace.js"></script>
+    
+    <!-- 2. Dados da aplicação -->
     <script src="categories.js"></script>
     <script src="products-data.js"></script>
-    <script src="app-state.js"></script>
     <script src="aromas.js"></script>
-    <script src="persistence.js"></script>
+    
+    <!-- 3. DOM e persistência -->
     <script src="dom.js"></script>
-    <script src="products.js"></script>
+    <script src="persistence.js"></script>
     <script src="utils.js"></script>
+    
+    <!-- 4. Lógica principal -->
+    <script src="products.js"></script>
     <script src="modal.js"></script>
     <script src="cart.js"></script>
     <script src="checkout.js"></script>
-    <script src="main.js"></script>
+    
+    <!-- 5. Inicialização -->
+    <script src="init.js"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ const DOM = {
   // Grid de produtos
   produtosGrid: document.getElementById('produtos-grid'),
   produtosNatal: document.getElementById('produtos-natal'),
+  categoriesGrid: document.querySelector('.categories-grid'),
   
   // Detalhes do produto (modal)
   modalCategoria: document.getElementById('modal-category'),

@@ -103,3 +103,73 @@ function filtrarProdutos() {
   
   renderizarProdutos(filtrados);
 }
+
+/**
+ * Renderizar produtos natalinos (página Natal)
+ */
+function renderizarProdutosNatal() {
+  const container = document.getElementById('produtos-natal');
+  
+  if (!container || !PRODUTOS_DATA) {
+    MESPIN.debug.log('Erro: Container ou dados não encontrados para produtos natalinos');
+    return;
+  }
+  
+  // Filtrar apenas produtos natalinos
+  const produtosNatalinos = PRODUTOS_DATA.filter(produto => produto.natal === true);
+  
+  if (produtosNatalinos.length === 0) {
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #666;">Nenhum produto natalino disponível no momento.</p>';
+    return;
+  }
+  
+  container.innerHTML = '';
+  
+  produtosNatalinos.forEach(produto => {
+    const disponivel = produto.disponivel !== false;
+    const imagemUrl = produto.imagem ? produto.imagem : null;
+    const categoriaNome = obterNomeCategoria(produto.categoriaId) || 'Produto';
+    
+    const cartaoHTML = `
+      <div class="product-card ${!disponivel ? 'indisponivel' : ''}" data-produto-id="${produto.id}">
+        <div class="product-image">
+          ${imagemUrl ? `<img src="${imagemUrl}" alt="${produto.nome}" onerror="this.src=''; this.nextElementSibling.style.display='flex';">` : ''}
+          <div class="image-fallback" style="${imagemUrl ? 'display:none;' : 'display:flex;'}">${produto.imagemAlternativa || '🎁'}</div>
+        </div>
+        
+        <div class="product-info">
+          <span class="product-category">${categoriaNome}</span>
+          <h3 class="product-name">${produto.nome}</h3>
+          <p class="product-description">${produto.descricao}</p>
+          
+          <div class="product-price">
+            R$ ${produto.preco.toFixed(2).replace('.', ',')}
+          </div>
+          
+          <div class="product-availability">
+            ${disponivel ? '<span class="disponivel">✓ Disponível</span>' : '<span class="indisponivel-badge">Indisponível</span>'}
+          </div>
+          
+          <button class="product-add-btn ${!disponivel ? 'disabled' : ''}" 
+                  data-produto-id="${produto.id}"
+                  ${!disponivel ? 'disabled' : ''}>
+            ${disponivel ? 'Adicionar ao Carrinho' : 'Indisponível'}
+          </button>
+        </div>
+      </div>
+    `;
+    
+    container.innerHTML += cartaoHTML;
+  });
+  
+  // Adicionar event listeners aos botões
+  container.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const produtoId = card.dataset.produtoId;
+      const produto = PRODUTOS_DATA.find(p => p.id === produtoId);
+      if (produto) {
+        abrirModalProduto(produto);
+      }
+    });
+  });
+}

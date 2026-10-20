@@ -1,0 +1,66 @@
+═══════════════════════════════════════════════════════════════════
+ARQUIVOS REMOVIDOS NA REFATORAÇÃO
+═══════════════════════════════════════════════════════════════════
+
+Data: 19 de outubro de 2026
+Razão: Consolidação de código e centralização do namespace
+
+ARQUIVOS CONSOLIDADOS EM namespace.js:
+────────────────────────────────────────────────────────────────
+1. config.js
+   - Variáveis WHATSAPP_NUMBER, CONFIG, VALIDATION
+   - Agora em: MESPIN.config
+   
+2. app-state.js
+   - Estado global window.app
+   - Agora em: MESPIN.state.app
+
+ARQUIVOS CONSOLIDADOS EM init.js:
+────────────────────────────────────────────────────────────────
+3. main.js
+   - Inicialização da aplicação
+   - Event listeners principais
+   - Agora em: init.js + configurarEventos()
+
+4. natal-main.js
+   - Inicialização da página Natal
+   - Renderização de produtos natalinos
+   - Agora em: init.js (renderizarProdutosNatal integrado)
+
+ARQUIVO DESCONTINUADO:
+────────────────────────────────────────────────────────────────
+5. dom.js
+   - Cache de referências DOM
+   - Substituído por: Referências diretas no código ou MESPIN.dom
+
+RAZÕES:
+────────────────────────────────────────────────────────────────
+✓ Reduz poluição do escopo global
+✓ Centraliza configurações em um único namespace
+✓ Elimina duplicação de código entre main.js e natal-main.js
+✓ Melhora rastreabilidade do estado
+✓ Simplifica inicialização (um script init.js para ambas as páginas)
+✓ Facilita debugging (MESPIN.debug.* métodos)
+
+RETROCOMPATIBILIDADE:
+────────────────────────────────────────────────────────────────
+Os seguintes aliases ainda funcionam para compatibilidade:
+- app → MESPIN.state.app
+- CONFIG → MESPIN.config
+- WHATSAPP_NUMBER → MESPIN.config.whatsappNumber
+- CEP_REFERENCIA → MESPIN.config.cepReferencia
+- FRETE_TABLE → MESPIN.config.frete.table
+- mostrarToast() → MESPIN.utils.mostrarToast()
+- validarTotalAromas() → MESPIN.utils.validarTotalAromas()
+- calcularFrete() → MESPIN.utils.calcularFrete()
+- calcularDistanciaHaversine() → MESPIN.utils.calcularDistanciaHaversine()
+
+PRÓXIMAS ETAPAS:
+────────────────────────────────────────────────────────────────
+[ ] Remover arquivo utils.js original (mover funções para namespace.js)
+[ ] Consolidar modal.js com lógica de validação
+[ ] Refatorar products.js
+[ ] Testar funcionalidades completas
+[ ] Validar em ambas as páginas (index.html e natal.html)
+
+═══════════════════════════════════════════════════════════════════

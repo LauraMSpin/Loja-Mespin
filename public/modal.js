@@ -3,6 +3,15 @@
 function abrirModalProduto(p) {
   console.log('abrirModalProduto chamada com:', p.nome);
   
+  // Obter referência ao modal de produto
+  const modalProduto = document.getElementById('modal-produto');
+  
+  // Fechar modal do carrinho primeiro
+  const modalCarrinhoEl = document.getElementById('modal-carrinho');
+  if (modalCarrinhoEl) {
+    modalCarrinhoEl.classList.remove('active');
+  }
+  
   // Limpar tooltip ao abrir novo modal
   const tooltip = document.getElementById('btn-tooltip');
   if (tooltip) tooltip.style.display = 'none';
@@ -170,9 +179,25 @@ function abrirModalProduto(p) {
 function fecharModalProduto() {
   console.log('fecharModalProduto chamada');
   
+  // Apenas fechar o modal do produto, não o overlay
+  // (usado quando abrindo outro modal como o carrinho)
+  const modalProduto = document.getElementById('modal-produto');
+  if (modalProduto) {
+    modalProduto.classList.remove('active');
+  }
+}
+
+function fecharModalProdutoCompleto() {
+  console.log('fecharModalProdutoCompleto chamada');
+  
+  // Fechar o modal do produto E o overlay
+  // (usado quando o usuário clica no X ou fora do modal)
   const overlay = document.querySelector('.modal-overlay');
   if (overlay) {
     overlay.classList.remove('active');
   }
-  modalProduto.classList.remove('active');
+  const modalProduto = document.getElementById('modal-produto');
+  if (modalProduto) {
+    modalProduto.classList.remove('active');
+  }
 }

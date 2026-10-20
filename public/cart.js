@@ -1,26 +1,32 @@
-// cart.js - Gerenciamento de carrinho
+/**
+ * CARRINHO - Gerenciamento de itens e operações
+ * ═══════════════════════════════════════════════════════════════
+ * Adiciona, remove, lista e persiste itens do carrinho
+ * ═══════════════════════════════════════════════════════════════
+ */
 
-console.log('✓ cart_novo.js carregado');
-
+/**
+ * Adiciona produto ao carrinho
+ */
 function adicionarAoCarrinho() {
   try {
     const pId = parseInt(modalProduto.dataset.produtoId);
     const qtd = parseInt(document.getElementById('qty-input').value) || 1;
-    const isKit = modalProduto.dataset.isKit === 'true' || modalProduto.dataset.isKit === true;
-    const p = app.produtos.find(x => x.id === pId);
-    
+    const p = MESPIN.state.app.produtos.find(x => x.id === pId);
+
     if (!p) {
       mostrarToast('Produto não encontrado', 'error');
       return;
     }
-    
+
     // Valida personalização
-    const validacao = validarTotalAromas(p);
+    const validacao = MESPIN.utils.validarTotalAromas(p);
     if (!validacao.valido) {
-      mostrarToast(`Distribua ${validacao.necessaria} ${isKit ? 'aroma(s)' : 'vela(s)'}`, 'error');
+      const tipo = (p.maxAromas || 999) < 999 ? 'aroma(s)' : 'vela(s)';
+      mostrarToast(`Distribua ${validacao.necessaria} ${tipo}`, 'error');
       return;
     }
-    
+
     // Coleta os aromas selecionados com suas quantidades
     const aromasCont = {};
     document.querySelectorAll('.spinner-input').forEach(inp => {
@@ -29,32 +35,77 @@ function adicionarAoCarrinho() {
         aromasCont[inp.dataset.aroma] = q;
       }
     });
-    
+
     // Formata string de aromas
     const aroma = Object.keys(aromasCont)
       .map(x => `${x} (${aromasCont[x]})`)
       .join(' + ');
-    
+
     // Adiciona ao carrinho
-    let item = app.carrinho.find(i => i.id === pId && i.aroma === aroma);
+    let item = MESPIN.state.app.carrinho.find(i => i.id === pId && i.aroma === aroma);
     if (item) {
       item.quantidade += qtd;
     } else {
-      app.carrinho.push({ id: pId, quantidade: qtd, aroma: aroma });
+      MESPIN.state.app.carrinho.push({ id: pId, quantidade: qtd, aroma: aroma });
     }
-    
+
     salvarCarrinho();
     atualizarCarrinho();
     fecharModalProduto();
     mostrarToast(p.nome + ' adicionado!');
+    MESPIN.debug.log(`Produto ${p.nome} adicionado ao carrinho`);
   } catch (e) {
     console.error('Erro ao adicionar:', e);
     mostrarToast('Erro ao adicionar', 'error');
   }
 }
 
+/**
+ * Remove produto do carrinho pelo índice
+ */
+function removerDoCarrinho(idx) {
+  if (MESPIN.state.app.carrinho && idx >= 0 && idx < MESPIN.state.app.carrinho.length) {
+    const removido = MESPIN.state.app.carrinho[idx];
+    MESPIN.state.app.carrinho.splice(idx, 1);
+    salvarCarrinho();
+    atualizarCarrinho();
+    abrirCarrinho();
+    mostrarToast('Removido do carrinho');
+    MESPIN.debug.log(`Produto removido: ${removido.id}`);
+  }
+}
+
+/**
+ * Limpa todo o carrinho com confirmação
+ */
+function limparCarrinho() {
+  if (confirm('Limpar carrinho?')) {
+    MESPIN.state.app.carrinho = [];
+    salvarCarrinho();
+    atualizarCarrinho();
+    abrirCarrinho();
+    mostrarToast('Carrinho limpo');
+    MESPIN.debug.log('Carrinho limpo completamente');
+  }
+}
+
+/**
+ * Atualiza contador visual do carrinho
+ */
+function atualizarCarrinho() {
+  const count = MESPIN.state.app.carrinho.reduce((total, item) => total + item.quantidade, 0);
+  const cartCount = document.querySelector('.cart-count');
+  if (cartCount) cartCount.textContent = count;
+}
+
+/**
+ * Abre modal do carrinho e lista itens
+ */
 function abrirCarrinho() {
   try {
+    // Fechar modal do produto primeiro
+    fecharModalProduto();
+    
     const itemsDiv = document.getElementById('carrinho-items');
     const vazioDiv = document.getElementById('carrinho-vazio');
     const totaisDiv = document.getElementById('carrinho-totais');
@@ -63,28 +114,18 @@ function abrirCarrinho() {
     const limparBtn = document.getElementById('limpar-carrinho');
     const modalCarrinhoEl = document.getElementById('modal-carrinho');
     const overlay = document.querySelector('.modal-overlay');
-    
-    console.log('abrirCarrinho:', {
-      itemsDiv: !!itemsDiv,
-      vazioDiv: !!vazioDiv,
-      totaisDiv: !!totaisDiv,
-      clienteForm: !!clienteForm,
-      finalizarBtn: !!finalizarBtn,
-      limparBtn: !!limparBtn,
-      modalCarrinhoEl: !!modalCarrinhoEl,
-      overlay: !!overlay
-    });
-    
+
+    // Verificar se todos os elementos existem
     if (!itemsDiv || !vazioDiv || !totaisDiv || !clienteForm || !modalCarrinhoEl || !overlay) {
-      console.error('Elementos do carrinho não encontrados', {
-        itemsDiv, vazioDiv, totaisDiv, clienteForm, modalCarrinhoEl, overlay
-      });
+      console.error('Elementos do carrinho não encontrados');
+      mostrarToast('Erro ao abrir carrinho', 'error');
       return;
     }
-    
+
     itemsDiv.innerHTML = '';
-    
-    if (!app.carrinho || app.carrinho.length === 0) {
+
+    // Verificar se carrinho está vazio
+    if (!MESPIN.state.app.carrinho || MESPIN.state.app.carrinho.length === 0) {
       vazioDiv.style.display = 'block';
       totaisDiv.style.display = 'none';
       clienteForm.style.display = 'none';
@@ -96,15 +137,16 @@ function abrirCarrinho() {
       clienteForm.style.display = 'block';
       if (finalizarBtn) finalizarBtn.style.display = 'block';
       if (limparBtn) limparBtn.style.display = 'block';
-      
+
+      // Listar itens do carrinho
       let subtotal = 0;
-      app.carrinho.forEach((item, idx) => {
-        const p = app.produtos.find(x => x.id === item.id);
+      MESPIN.state.app.carrinho.forEach((item, idx) => {
+        const p = MESPIN.state.app.produtos.find(x => x.id === item.id);
         if (!p) return;
-        
+
         const itemTotal = p.preco * item.quantidade;
         subtotal += itemTotal;
-        
+
         const itemDiv = document.createElement('div');
         itemDiv.className = 'carrinho-item';
         itemDiv.innerHTML = `
@@ -115,103 +157,66 @@ function abrirCarrinho() {
           </div>
           <button class="item-remover" data-index="${idx}">🗑️</button>
         `;
-        
+
         itemDiv.querySelector('.item-remover').addEventListener('click', () => {
           removerDoCarrinho(idx);
         });
-        
+
         itemsDiv.appendChild(itemDiv);
       });
-      
-      const frete = app.freteInfo?.frete || 0;
+
+      // Calcular totais
+      const frete = MESPIN.state.app.freteInfo?.frete || 0;
       const total = subtotal + frete;
-      
+
       const subtotalEl = document.getElementById('subtotal');
-      const taxaEl = document.getElementById('taxa');
+      const freteEl = document.getElementById('taxa');
       const totalEl = document.getElementById('total');
-      
+
       if (subtotalEl) subtotalEl.textContent = subtotal.toFixed(2);
-      if (taxaEl) taxaEl.textContent = frete.toFixed(2);
+      if (freteEl) freteEl.textContent = frete.toFixed(2);
       if (totalEl) totalEl.textContent = total.toFixed(2);
     }
-    
-    // Atualiza dados do cliente
+
+    // Restaurar dados do cliente
     const nomeInput = document.getElementById('cliente-nome');
     const cepInput = document.getElementById('cliente-cep');
-    
-    if (nomeInput) nomeInput.value = app.clienteInfo.nome || '';
+
+    if (nomeInput) nomeInput.value = MESPIN.state.app.clienteInfo.nome || '';
     if (cepInput) {
-      cepInput.value = app.clienteInfo.cep || '';
-      // Adicionar listener para quando o CEP muda
+      cepInput.value = MESPIN.state.app.clienteInfo.cep || '';
+
+      // Adicionar listener para atualizar CEP
       cepInput.addEventListener('blur', atualizarOpcoesEntrega);
       cepInput.addEventListener('input', () => {
-        // Formatar CEP enquanto digita
         let value = cepInput.value.replace(/\D/g, '');
         if (value.length > 5) {
           value = value.substring(0, 5) + '-' + value.substring(5);
         }
         cepInput.value = value;
+        MESPIN.state.app.clienteInfo.cep = value;
       });
     }
-    
-    // Abre o modal
-    console.log('Ativando modal:', {
-      overlay: !!overlay,
-      modalCarrinhoEl: !!modalCarrinhoEl,
-      overlayClass: overlay?.className,
-      modalClass: modalCarrinhoEl?.className
-    });
-    
-    if (overlay) {
-      overlay.classList.add('active');
-      console.log('Overlay ativado:', overlay.className);
-    }
-    if (modalCarrinhoEl) {
-      modalCarrinhoEl.classList.add('active');
-      console.log('Modal carrinho ativado:', modalCarrinhoEl.className);
-    }
+
+    // Abrir modal
+    overlay.classList.add('active');
+    modalCarrinhoEl.classList.add('active');
+    MESPIN.debug.log('Modal carrinho aberto');
   } catch (e) {
     console.error('Erro ao abrir carrinho:', e);
     mostrarToast('Erro ao abrir carrinho', 'error');
   }
 }
 
-function removerDoCarrinho(idx) {
-  if (app.carrinho && idx >= 0 && idx < app.carrinho.length) {
-    app.carrinho.splice(idx, 1);
-    salvarCarrinho();
-    atualizarCarrinho();
-    abrirCarrinho();
-    mostrarToast('Removido do carrinho');
-  }
+/**
+ * Fecha o modal do carrinho completamente (inclui overlay)
+ */
+function fecharModalCarrinho() {
+  const overlay = document.querySelector('.modal-overlay');
+  if (overlay) overlay.classList.remove('active');
+  const modalCarrinho = document.getElementById('modal-carrinho');
+  if (modalCarrinho) modalCarrinho.classList.remove('active');
 }
 
-function limparCarrinho() {
-  if (confirm('Limpar carrinho?')) {
-    app.carrinho = [];
-    salvarCarrinho();
-    atualizarCarrinho();
-    abrirCarrinho();
-    mostrarToast('Carrinho limpo');
-  }
-}
-
-function atualizarCarrinho() {
-  const count = app.carrinho.reduce((total, item) => total + item.quantidade, 0);
-  if (cartCount) cartCount.textContent = count;
-}
-
-// Event Listeners para botões de carrinho
-document.addEventListener('DOMContentLoaded', () => {
-  const btnFinalizarCompra = document.getElementById('finalizar-compra');
-  const btnLimparCarrinho = document.getElementById('limpar-carrinho');
-  
-  if (btnFinalizarCompra) {
-    btnFinalizarCompra.addEventListener('click', finalizarCompra);
-  }
-  
-  if (btnLimparCarrinho) {
-    btnLimparCarrinho.addEventListener('click', limparCarrinho);
-  }
-});
+console.log('✓ cart.js carregado');
 

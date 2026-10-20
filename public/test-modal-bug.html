@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste - Modal Bug Fix</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-container { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .test-case { margin: 10px 0; padding: 10px; background: #f9f9f9; border-left: 4px solid #999; }
+        .pass { border-left-color: green; background: #f0fff0; }
+        .fail { border-left-color: red; background: #fff0f0; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #333; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #555; }
+        #debug-log { background: #000; color: #0f0; padding: 15px; border-radius: 4px; overflow-y: auto; height: 300px; font-size: 12px; font-family: monospace; margin-top: 20px; }
+        .status { padding: 5px 10px; border-radius: 3px; display: inline-block; font-weight: bold; margin: 2px; }
+        .status.active { background: green; color: white; }
+        .status.inactive { background: #ccc; color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Teste de Correção do Bug Modal</h1>
+    
+    <div class="test-container">
+        <h2>Estado Atual dos Modais</h2>
+        <p>Modal Produto: <span id="status-produto" class="status inactive">OCULTO</span></p>
+        <p>Modal Carrinho: <span id="status-carrinho" class="status inactive">OCULTO</span></p>
+        <p>Overlay: <span id="status-overlay" class="status inactive">OCULTO</span></p>
+    </div>
+
+    <div class="test-container">
+        <h2>Controles de Teste</h2>
+        <button onclick="teste1()">Teste 1: Abrir Carrinho (vazio)</button>
+        <button onclick="teste2()">Teste 2: Fechar Carrinho</button>
+        <button onclick="teste3()">Teste 3: Abrir Produto</button>
+        <button onclick="teste4()">Teste 4: Abrir Carrinho com Produto Aberto</button>
+        <button onclick="teste5()">Teste 5: Fechar com X</button>
+        <button onclick="limparLogs()">Limpar Logs</button>
+    </div>
+
+    <div class="test-container">
+        <h2>Resultados dos Testes</h2>
+        <div id="results"></div>
+    </div>
+
+    <h3>Debug Log</h3>
+    <div id="debug-log"></div>
+
+    <!-- Carregar o index.html via iframe para ter acesso aos modais -->
+    <iframe id="app-frame" src="index.html" style="display:none;"></iframe>
+
+    <script>
+        let testResults = [];
+        let debugLog = [];
+
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLog.push(logEntry);
+            updateDebugLog();
+            console.log(logEntry);
+        }
+
+        function updateDebugLog() {
+            const logEl = document.getElementById('debug-log');
+            logEl.innerHTML = debugLog.map(l => l + '<br>').join('');
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function limparLogs() {
+            debugLog = [];
+            testResults = [];
+            document.getElementById('results').innerHTML = '';
+            updateDebugLog();
+        }
+
+        function getStatus() {
+            const frame = document.getElementById('app-frame');
+            if (!frame.contentDocument) {
+                log('❌ Não conseguiu acessar iframe');
+                return null;
+            }
+
+            const doc = frame.contentDocument;
+            const modalProduto = doc.getElementById('modal-produto');
+            const modalCarrinho = doc.getElementById('modal-carrinho');
+            const overlay = doc.querySelector('.modal-overlay');
+
+            if (!modalProduto || !modalCarrinho || !overlay) {
+                log('❌ Elementos não encontrados no iframe');
+                return null;
+            }
+
+            const produtoVisivel = modalProduto.classList.contains('active');
+            const carrinhoVisivel = modalCarrinho.classList.contains('active');
+            const overlayVisivel = overlay.classList.contains('active');
+
+            return { produtoVisivel, carrinhoVisivel, overlayVisivel, modalProduto, modalCarrinho, overlay };
+        }
+
+        function updateStatusUI() {
+            const status = getStatus();
+            if (!status) return;
+
+            document.getElementById('status-produto').className = `status ${status.produtoVisivel ? 'active' : 'inactive'}`;
+            document.getElementById('status-produto').textContent = status.produtoVisivel ? 'VISÍVEL' : 'OCULTO';
+
+            document.getElementById('status-carrinho').className = `status ${status.carrinhoVisivel ? 'active' : 'inactive'}`;
+            document.getElementById('status-carrinho').textContent = status.carrinhoVisivel ? 'VISÍVEL' : 'OCULTO';
+
+            document.getElementById('status-overlay').className = `status ${status.overlayVisivel ? 'active' : 'inactive'}`;
+            document.getElementById('status-overlay').textContent = status.overlayVisivel ? 'VISÍVEL' : 'OCULTO';
+        }
+
+        function addResult(testName, passed, details) {
+            const result = {
+                name: testName,
+                passed,
+                details,
+                status: passed ? 'PASSOU ✓' : 'FALHOU ✗'
+            };
+            testResults.push(result);
+            
+            const resultsDiv = document.getElementById('results');
+            const testDiv = document.createElement('div');
+            testDiv.className = `test-case ${passed ? 'pass' : 'fail'}`;
+            testDiv.innerHTML = `<strong>${testName}:</strong> ${result.status}<br><small>${details}</small>`;
+            resultsDiv.appendChild(testDiv);
+
+            log(`${result.status} - ${testName}: ${details}`);
+        }
+
+        function teste1() {
+            log('🧪 Iniciando Teste 1: Abrir Carrinho (vazio)');
+            
+            const status = getStatus();
+            if (!status) return;
+
+            // Estado inicial
+            log(`   Estado inicial: Produto=${status.produtoVisivel}, Carrinho=${status.carrinhoVisivel}, Overlay=${status.overlayVisivel}`);
+
+            // Clicar no botão do carrinho
+            const cartBtn = document.getElementById('app-frame').contentDocument.querySelector('button:has-text("🛒")') || 
+                            document.getElementById('app-frame').contentDocument.querySelector('button[id*="cart"]') ||
+                            Array.from(document.getElementById('app-frame').contentDocument.querySelectorAll('button')).find(b => b.textContent.includes('🛒'));
+            
+            if (cartBtn) {
+                log(`   Clicando no botão do carrinho...`);
+                cartBtn.click();
+                setTimeout(() => {
+                    const statusDepois = getStatus();
+                    updateStatusUI();
+                    
+                    // Validar estado esperado
+                    const passou = !statusDepois.produtoVisivel && statusDepois.carrinhoVisivel && statusDepois.overlayVisivel;
+                    addResult('Teste 1', passou, 
+                        `Produto=${statusDepois.produtoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Carrinho=${statusDepois.carrinhoVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}, ` +
+                        `Overlay=${statusDepois.overlayVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}`
+                    );
+                }, 500);
+            } else {
+                log('❌ Não conseguiu encontrar botão do carrinho');
+            }
+        }
+
+        function teste2() {
+            log('🧪 Iniciando Teste 2: Fechar Carrinho');
+            
+            const frame = document.getElementById('app-frame').contentDocument;
+            const closeBtn = frame.querySelector('#modal-carrinho .modal-header button') || 
+                            frame.querySelector('.modal-carrinho-close');
+            
+            if (closeBtn) {
+                log(`   Clicando no botão de fechar...`);
+                closeBtn.click();
+                setTimeout(() => {
+                    const status = getStatus();
+                    updateStatusUI();
+                    
+                    // Validar estado esperado
+                    const passou = !status.produtoVisivel && !status.carrinhoVisivel && !status.overlayVisivel;
+                    addResult('Teste 2', passou,
+                        `Produto=${status.produtoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Carrinho=${status.carrinhoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Overlay=${status.overlayVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}`
+                    );
+                }, 500);
+            }
+        }
+
+        function teste3() {
+            log('🧪 Iniciando Teste 3: Abrir Produto');
+            
+            const frame = document.getElementById('app-frame').contentDocument;
+            const productCard = frame.querySelector('[data-produto-id]');
+            
+            if (productCard) {
+                log(`   Encontrado card de produto, clicando...`);
+                productCard.click();
+                setTimeout(() => {
+                    const status = getStatus();
+                    updateStatusUI();
+                    
+                    const passou = status.produtoVisivel && !status.carrinhoVisivel && status.overlayVisivel;
+                    addResult('Teste 3', passou,
+                        `Produto=${status.produtoVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}, ` +
+                        `Carrinho=${status.carrinhoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Overlay=${status.overlayVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}`
+                    );
+                }, 500);
+            } else {
+                log('❌ Não conseguiu encontrar card de produto');
+            }
+        }
+
+        function teste4() {
+            log('🧪 Iniciando Teste 4: Abrir Carrinho com Produto Aberto');
+            
+            // Primeiro abrir produto
+            teste3();
+            
+            setTimeout(() => {
+                // Depois abrir carrinho
+                const frame = document.getElementById('app-frame').contentDocument;
+                const cartBtn = Array.from(frame.querySelectorAll('button')).find(b => b.textContent.includes('🛒'));
+                
+                if (cartBtn) {
+                    log(`   Clicando no carrinho...`);
+                    cartBtn.click();
+                    setTimeout(() => {
+                        const status = getStatus();
+                        updateStatusUI();
+                        
+                        // Produto deve estar oculto, carrinho visível
+                        const passou = !status.produtoVisivel && status.carrinhoVisivel && status.overlayVisivel;
+                        addResult('Teste 4', passou,
+                            `Produto=${status.produtoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                            `Carrinho=${status.carrinhoVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}, ` +
+                            `Overlay=${status.overlayVisivel ? 'VISÍVEL ✓' : 'OCULTO ❌'}`
+                        );
+                    }, 500);
+                }
+            }, 600);
+        }
+
+        function teste5() {
+            log('🧪 Iniciando Teste 5: Fechar com X (qualquer modal aberto)');
+            
+            const frame = document.getElementById('app-frame').contentDocument;
+            const xButtons = frame.querySelectorAll('.modal-header button');
+            
+            if (xButtons.length > 0) {
+                log(`   Encontrado botão X, clicando...`);
+                xButtons[0].click();
+                setTimeout(() => {
+                    const status = getStatus();
+                    updateStatusUI();
+                    
+                    const passou = !status.produtoVisivel && !status.carrinhoVisivel && !status.overlayVisivel;
+                    addResult('Teste 5', passou,
+                        `Produto=${status.produtoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Carrinho=${status.carrinhoVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}, ` +
+                        `Overlay=${status.overlayVisivel ? 'VISÍVEL ❌' : 'OCULTO ✓'}`
+                    );
+                }, 500);
+            }
+        }
+
+        // Atualizar status quando iframe carregar
+        document.getElementById('app-frame').onload = function() {
+            log('✓ iframe carregado');
+            updateStatusUI();
+        };
+    </script>
+</body>
+</html>

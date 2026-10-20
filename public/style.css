@@ -93,6 +93,8 @@ main {
    ============================================ */
 
 header {
+  position: relative;
+  z-index: 1001;
   background-color: var(--cor-bege-intenso);
   border-bottom: 2px solid var(--cor-marrom-quente);
   padding: var(--sp-md) var(--sp-lg);
@@ -911,7 +913,7 @@ nav {
    MODAL PRODUTO - LAYOUT COMPACTO (2 COLUNAS)
    ============================================ */
 
-.modal-produto-compacto {
+.modal.active.modal-produto-compacto {
   width: 90vw;
   max-width: 900px;
   max-height: calc(100dvh - 32px);
@@ -1181,7 +1183,7 @@ nav {
 
 /* Responsividade - Mobile */
 @media (max-width: 768px) {
-  .modal-produto-compacto {
+  .modal.active.modal-produto-compacto {
     width: 95vw;
     max-width: 100%;
     max-height: calc(100dvh - 16px);
@@ -1229,7 +1231,7 @@ nav {
 }
 
 @media (max-width: 480px) {
-  .modal-produto-compacto {
+  .modal.active.modal-produto-compacto {
     width: 100%;
     border-radius: 0;
     max-height: 100dvh;

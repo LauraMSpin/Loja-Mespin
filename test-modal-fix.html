@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Modal Fix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #8B6F47;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            background: #8B6F47;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #6B5535;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status-line {
+            padding: 2px 0;
+            color: #333;
+        }
+
+        .status-line.error {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .status-line.success {
+            color: #388e3c;
+            font-weight: bold;
+        }
+
+        .status-line.info {
+            color: #1976d2;
+        }
+
+        /* Modal Overlay styles (from style.css) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            background: white;
+            border-radius: 8px;
+            position: absolute;
+            padding: 20px;
+            min-width: 300px;
+        }
+
+        .modal.active {
+            display: block;
+        }
+
+        /* Modal Produto Compacto - NOW with .modal.active specificity */
+        .modal.active.modal-produto-compacto {
+            width: 90vw;
+            max-width: 900px;
+            max-height: calc(100dvh - 32px);
+            height: calc(100dvh - 32px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-content {
+            padding: 20px;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #333;
+            padding: 0;
+            margin: -5px -5px 0 0;
+        }
+
+        .modal-close:hover {
+            color: #d32f2f;
+        }
+
+        .test-result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .test-result.pass {
+            background: #c8e6c9;
+            color: #2e7d32;
+            border: 1px solid #388e3c;
+        }
+
+        .test-result.fail {
+            background: #ffcdd2;
+            color: #c62828;
+            border: 1px solid #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Teste de Correção Modal</h1>
+
+        <!-- Modal Overlay Container -->
+        <div class="modal-overlay" id="modal-overlay">
+            <!-- Modal Produto -->
+            <div id="modal-produto" class="modal modal-produto-compacto">
+                <button class="modal-close">&times;</button>
+                <div class="modal-content">
+                    <h2>Produto - Modal Detalhes</h2>
+                    <p>Este é o modal de detalhes do produto.</p>
+                </div>
+            </div>
+
+            <!-- Modal Carrinho -->
+            <div id="modal-carrinho" class="modal">
+                <button class="modal-close">&times;</button>
+                <div class="modal-content">
+                    <h2>🛒 Carrinho</h2>
+                    <p>Este é o modal do carrinho de compras.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teste 1: Abrir Modal Produto -->
+        <div class="test-section">
+            <h3>Teste 1: Abrir Modal Produto</h3>
+            <button onclick="teste1()">Abrir Produto</button>
+            <button onclick="resetar()">Resetar</button>
+            <div class="status" id="status1"></div>
+        </div>
+
+        <!-- Teste 2: Abrir Carrinho com Modal Produto Aberto -->
+        <div class="test-section">
+            <h3>Teste 2: Abrir Produto → Abrir Carrinho</h3>
+            <button onclick="teste2()">Executar Teste 2</button>
+            <button onclick="resetar()">Resetar</button>
+            <div class="status" id="status2"></div>
+        </div>
+
+        <!-- Teste 3: Fechar Carrinho e Abrir Outro Produto -->
+        <div class="test-section">
+            <h3>Teste 3: Carrinho → Fechar → Abrir Produto</h3>
+            <button onclick="teste3()">Executar Teste 3</button>
+            <button onclick="resetar()">Resetar</button>
+            <div class="status" id="status3"></div>
+        </div>
+
+        <!-- Teste 4: Verificar CSS Specificity -->
+        <div class="test-section">
+            <h3>Teste 4: CSS Specificity (Modal Produto sem active)</h3>
+            <button onclick="teste4()">Verificar Estilos</button>
+            <div class="status" id="status4"></div>
+        </div>
+
+        <div class="test-result" id="test-result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const log = (statusId, message, type = 'info') => {
+            const el = document.getElementById(statusId);
+            if (!el) return;
+            const line = document.createElement('div');
+            line.className = `status-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            el.appendChild(line);
+            el.scrollTop = el.scrollHeight;
+        };
+
+        const verificarEstado = (statusId) => {
+            const overlay = document.getElementById('modal-overlay');
+            const produto = document.getElementById('modal-produto');
+            const carrinho = document.getElementById('modal-carrinho');
+
+            const overlayActive = overlay.classList.contains('active');
+            const produtoActive = produto.classList.contains('active');
+            const carrinhoActive = carrinho.classList.contains('active');
+
+            log(statusId, `Overlay.active: ${overlayActive}`, 'info');
+            log(statusId, `Produto.active: ${produtoActive}`, 'info');
+            log(statusId, `Carrinho.active: ${carrinhoActive}`, 'info');
+
+            const produtoDisplay = window.getComputedStyle(produto).display;
+            const carrinhoDisplay = window.getComputedStyle(carrinho).display;
+
+            log(statusId, `Produto display: ${produtoDisplay}`, 'info');
+            log(statusId, `Carrinho display: ${carrinhoDisplay}`, 'info');
+
+            return { overlayActive, produtoActive, carrinhoActive, produtoDisplay, carrinhoDisplay };
+        };
+
+        const teste1 = () => {
+            const statusId = 'status1';
+            document.getElementById(statusId).innerHTML = '';
+            
+            log(statusId, 'Abrindo modal do produto...', 'info');
+            const overlay = document.getElementById('modal-overlay');
+            const produto = document.getElementById('modal-produto');
+            
+            overlay.classList.add('active');
+            produto.classList.add('active');
+            
+            setTimeout(() => {
+                const estado = verificarEstado(statusId);
+                
+                if (estado.produtoActive && estado.overlayActive && estado.produtoDisplay !== 'none') {
+                    log(statusId, '✓ Modal do Produto aberto corretamente', 'success');
+                } else {
+                    log(statusId, '✗ Erro ao abrir modal do Produto', 'error');
+                }
+            }, 100);
+        };
+
+        const teste2 = () => {
+            const statusId = 'status2';
+            document.getElementById(statusId).innerHTML = '';
+            
+            log(statusId, '1. Abrindo modal do produto...', 'info');
+            const overlay = document.getElementById('modal-overlay');
+            const produto = document.getElementById('modal-produto');
+            const carrinho = document.getElementById('modal-carrinho');
+            
+            overlay.classList.add('active');
+            produto.classList.add('active');
+            
+            setTimeout(() => {
+                log(statusId, '2. Abrindo modal do carrinho (fechando produto)...', 'info');
+                
+                // Simular fecharModalProduto()
+                produto.classList.remove('active');
+                
+                // Simular abrirCarrinho()
+                carrinho.classList.add('active');
+                
+                setTimeout(() => {
+                    const estado = verificarEstado(statusId);
+                    
+                    if (!estado.produtoActive && estado.carrinhoActive && estado.carrinhoDisplay !== 'none') {
+                        log(statusId, '✓ Apenas carrinho visível', 'success');
+                    } else {
+                        log(statusId, '✗ Erro: Produto ainda está visível ou carrinho não abriu', 'error');
+                    }
+                }, 100);
+            }, 100);
+        };
+
+        const teste3 = () => {
+            const statusId = 'status3';
+            document.getElementById(statusId).innerHTML = '';
+            
+            log(statusId, '1. Abrindo modal do carrinho...', 'info');
+            const overlay = document.getElementById('modal-overlay');
+            const produto = document.getElementById('modal-produto');
+            const carrinho = document.getElementById('modal-carrinho');
+            
+            overlay.classList.add('active');
+            carrinho.classList.add('active');
+            
+            setTimeout(() => {
+                log(statusId, '2. Fechando modal do carrinho...', 'info');
+                overlay.classList.remove('active');
+                carrinho.classList.remove('active');
+                
+                setTimeout(() => {
+                    log(statusId, '3. Abrindo novo modal de produto...', 'info');
+                    overlay.classList.add('active');
+                    produto.classList.add('active');
+                    
+                    setTimeout(() => {
+                        const estado = verificarEstado(statusId);
+                        
+                        if (estado.produtoActive && !estado.carrinhoActive && estado.produtoDisplay !== 'none') {
+                            log(statusId, '✓ Apenas produto visível', 'success');
+                        } else {
+                            log(statusId, '✗ Erro ao alternar modais', 'error');
+                        }
+                    }, 100);
+                }, 100);
+            }, 100);
+        };
+
+        const teste4 = () => {
+            const statusId = 'status4';
+            document.getElementById(statusId).innerHTML = '';
+            
+            const produto = document.getElementById('modal-produto');
+            
+            // Remover classe active
+            produto.classList.remove('active');
+            
+            setTimeout(() => {
+                const display = window.getComputedStyle(produto).display;
+                const hasCompactoClass = produto.classList.contains('modal-produto-compacto');
+                const hasModalClass = produto.classList.contains('modal');
+                const hasActiveClass = produto.classList.contains('active');
+                
+                log(statusId, `Classes: modal=${hasModalClass}, modal-produto-compacto=${hasCompactoClass}, active=${hasActiveClass}`, 'info');
+                log(statusId, `Computed display: ${display}`, 'info');
+                
+                if (display === 'none') {
+                    log(statusId, '✓ Modal corretamente oculto quando sem classe active', 'success');
+                } else {
+                    log(statusId, '✗ CSS specificity ainda está causando problema', 'error');
+                }
+            }, 100);
+        };
+
+        const resetar = () => {
+            const overlay = document.getElementById('modal-overlay');
+            const produto = document.getElementById('modal-produto');
+            const carrinho = document.getElementById('modal-carrinho');
+            
+            overlay.classList.remove('active');
+            produto.classList.remove('active');
+            carrinho.classList.remove('active');
+            
+            document.getElementById('status1').innerHTML = '';
+            document.getElementById('status2').innerHTML = '';
+            document.getElementById('status3').innerHTML = '';
+            document.getElementById('status4').innerHTML = '';
+            document.getElementById('test-result').style.display = 'none';
+        };
+
+        // Log de inicialização
+        console.log('✓ Página de teste carregada');
+        console.log('Verifique o CSS specificity na aba Estilos do DevTools');
+        console.log('Procure por: .modal-produto-compacto vs .modal.active.modal-produto-compacto');
+    </script>
+</body>
+</html>
